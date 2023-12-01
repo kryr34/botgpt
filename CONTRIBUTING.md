@@ -1,0 +1,1 @@
+1. Add [Gitmoji](https://github.com/carloscuesta/gitmoji) to every commit message title.
