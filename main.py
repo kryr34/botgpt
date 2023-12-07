@@ -2,6 +2,7 @@ from dotenv import dotenv_values
 import discord
 from openai import OpenAI
 
+
 config = dotenv_values(".env") 
 
 openai_client = OpenAI(
@@ -11,11 +12,8 @@ openai_client = OpenAI(
 
 # Set up the Discord bot
 intents = discord.Intents.default()
-# intents.message_content = True
-
-bot = discord.Client(
-    intents=discord.Intents.default()
-)
+intents.message_content = True
+bot = discord.Client(intents=intents)
 
 # Event triggered when the bot is ready
 @bot.event
@@ -30,15 +28,13 @@ async def on_message(message):
 
     # Process the message and get suggestions from OpenAI
     suggestion = get_openai_suggestion(message.content)
-
     # Send the suggestion back to the same channel
-    await message.channel.send(f"Suggestion: {suggestion}")
-
-    # Continue processing other events
-    await bot.process_commands(message)
+    await message.channel.send(f"Suggestion: {suggestion}") 
 
 # Function to get suggestions from OpenAI
 def get_openai_suggestion(text):
+    print(f"Input text to ChatGPT: {text}")
+    
     # You can customize the prompt based on your requirements
     prompt = f"Given the text: {text}, what would be a better version?"
 
@@ -46,15 +42,16 @@ def get_openai_suggestion(text):
     response = openai_client.chat.completions.create(
         messages=[
             {
-                "role": "user",
-                "content": prompt,
+                "role": "assistant",
+                "content": prompt, 
             }
         ],
         model="gpt-3.5-turbo",
     )
 
     # Extract and return the suggestion from the response
-    suggestion = response['choices'][0]['text'].strip()
+    suggestion = response.choices[0].message.content #.strip()
+    print(f"ChatGPT say:{suggestion}")
     return suggestion
 
 if __name__ == '__main__':
